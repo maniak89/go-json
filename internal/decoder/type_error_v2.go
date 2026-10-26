@@ -225,15 +225,14 @@ func (ctx *RuntimeContext) unsettableFieldError(cursor, depth int64, typ reflect
 	return next, err
 }
 
-// storesFloatsOutOfRange reports whether a number out of the range of a float is stored as ±Inf with its type
-// error, as encoding/json of Go 1.27 does.
-const storesFloatsOutOfRange = true
+// storesFloatsOutOfRange reports whether an overflowing number is stored with its type error.
+// Legacy decoding leaves the destination unchanged on overflow.
+const storesFloatsOutOfRange = false
 
 // floatRangeErrorOfInterface records the type error of the number between start and end, which is out of the
-// range of a float64, decoded into the interface{} at p, and stores f, which is ±Inf, as encoding/json of Go 1.27
-// does.
+// range of a float64, decoded into the interface{} at p, and stores zero, as legacy decoding does.
 func (ctx *RuntimeContext) floatRangeErrorOfInterface(start, end int64, f float64, p unsafe.Pointer) {
-	**(**any)(unsafe.Pointer(&p)) = ctx.boxFloat(f)
+	**(**any)(unsafe.Pointer(&p)) = ctx.boxFloat(0)
 	ctx.numberTypeError(start, end, float64Type)
 }
 

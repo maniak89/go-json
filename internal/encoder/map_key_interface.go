@@ -91,6 +91,10 @@ func interfaceMapKeyName(keyType reflect.Type, key reflect.Value) (string, error
 // whose methods on the pointer are called.
 func mapKeyNameOf(v reflect.Value, byPointer bool) (string, error) {
 	t := v.Type()
+	// Legacy string keys use their underlying value before their text methods.
+	if t.Kind() == reflect.String {
+		return v.String(), nil
+	}
 	if t.Kind() != reflect.Pointer {
 		switch {
 		case t.Implements(textAppenderType):

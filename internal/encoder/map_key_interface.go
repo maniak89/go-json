@@ -211,6 +211,11 @@ func valueKeyName(x any, byPointer bool) (string, error) {
 // methodKeyName returns the name of the value which x holds, or which x points to, by AppendText or MarshalText of
 // x, and whether x has one of them.
 func methodKeyName(x any) (string, bool, error) {
+	// Legacy map keys use a string's underlying value before its text methods,
+	// including when the string is held by an interface.
+	if v := reflect.ValueOf(x); v.Kind() == reflect.String {
+		return v.String(), true, nil
+	}
 	var b []byte
 	var err error
 	switch m := x.(type) {

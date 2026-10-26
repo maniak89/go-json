@@ -202,7 +202,7 @@ func TestIssue448NumberGrammar(t *testing.T) {
 
 func TestIssue555NumbersOutOfRange(t *testing.T) {
 	// A number out of the range of a float64 decoded into an interface{} is a type error, after which the
-	// decoding goes on, and a float is set to ±Inf.
+	// decoding goes on without storing the overflowing value.
 	huge := "1" + strings.Repeat("0", 400)
 	for _, n := range []string{`1e400`, `-1e400`, huge, `1e39`, `-1e39`, `1e-400`} {
 		for _, doc := range []string{n, `{"n":` + n + `,"m":1}`, `[` + n + `,1]`} {
